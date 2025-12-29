@@ -20,7 +20,7 @@ export function ChatContainer() {
   useEffect(() => {
     const savedMessages = loadMessages();
     setMessages(savedMessages);
-  }, []);
+  }, [loadMessages]);
 
   // Sync messages to localStorage
   useChatPersistence(messages);

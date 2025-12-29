@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.3",
