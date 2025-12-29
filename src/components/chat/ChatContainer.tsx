@@ -1,36 +1,16 @@
 'use client';
 
-import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
-import { useChatPersistence } from '@/hooks/useChatPersistence';
+import { useState, FormEvent, ChangeEvent } from 'react';
 import { MessageMode, ChatMessage } from '@/types/chat';
 import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { ModeSelector } from './ModeSelector';
-import { Button } from '@/components/ui/Button';
-import { Trash2 } from 'lucide-react';
 
 export function ChatContainer() {
   const [mode, setMode] = useState<MessageMode>('quick');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { loadMessages, clearHistory } = useChatPersistence([]);
-
-  // Load messages only on client side after hydration
-  useEffect(() => {
-    setMounted(true);
-    const savedMessages = loadMessages();
-    setMessages(savedMessages);
-  }, [loadMessages]);
-
-  // Sync messages to localStorage
-  useChatPersistence(messages);
-
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return null;
-  }
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -112,33 +92,13 @@ export function ChatContainer() {
     }
   };
 
-  const handleClearHistory = () => {
-    if (confirm('Are you sure you want to clear all chat history?')) {
-      clearHistory();
-      setMessages([]);
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Mahabharata Knowledge Base
-          </h1>
-          {messages.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClearHistory}
-              className="text-gray-600 hover:text-red-600"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Clear History
-            </Button>
-          )}
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          Mahabharata Knowledge Base
+        </h1>
         <ModeSelector mode={mode} onModeChange={setMode} disabled={isLoading} />
       </div>
 

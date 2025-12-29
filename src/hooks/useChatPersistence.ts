@@ -5,8 +5,11 @@ const STORAGE_KEY = 'mahabharata-chat-history';
 const MAX_MESSAGES = 100; // Limit to prevent localStorage quota issues
 
 export function useChatPersistence(messages: ChatMessage[]) {
-  // Save to localStorage whenever messages change
+  // Save to localStorage whenever messages change (client-side only)
   useEffect(() => {
+    // Guard against SSR
+    if (typeof window === 'undefined') return;
+
     if (messages.length > 0) {
       // Keep only last 100 messages to prevent quota issues
       const trimmed = messages.slice(-MAX_MESSAGES);
