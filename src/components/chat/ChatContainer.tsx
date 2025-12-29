@@ -14,16 +14,23 @@ export function ChatContainer() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { loadMessages, clearHistory } = useChatPersistence([]);
 
-  // Load messages only on client side
+  // Load messages only on client side after hydration
   useEffect(() => {
+    setMounted(true);
     const savedMessages = loadMessages();
     setMessages(savedMessages);
   }, [loadMessages]);
 
   // Sync messages to localStorage
   useChatPersistence(messages);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return null;
+  }
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
