@@ -3,15 +3,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["iad1"],
-  "env": {
-    "KNOWLEDGE_SERVICE_URL": "@knowledge_service_url"
-  },
-  "build": {
-    "env": {
-      "KNOWLEDGE_SERVICE_URL": "@knowledge_service_url"
-    }
-  },
   "headers": [
     {
       "source": "/api/(.*)",
