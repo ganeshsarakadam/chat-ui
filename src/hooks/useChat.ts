@@ -5,7 +5,7 @@ import { Message } from '@/types/chat';
 
 export type MessageMode = 'quick' | 'detailed';
 
-export function useChat(domain: string) {
+export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 

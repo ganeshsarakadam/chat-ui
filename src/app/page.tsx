@@ -1,25 +1,18 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ChatContainer } from '@/components/ChatContainer';
 
 function ChatApp() {
   const searchParams = useSearchParams();
-  const [domain, setDomain] = useState<string>('default');
-
-  useEffect(() => {
-    // Get domain from URL query parameter
-    const domainParam = searchParams.get('domain');
-    if (domainParam) {
-      setDomain(domainParam);
-    }
-  }, [searchParams]);
+  // Get domain from URL query parameter, default to 'default'
+  const domain = searchParams.get('domain') || 'default';
 
   return (
     <ThemeProvider domainId={domain}>
-      <ChatContainer domain={domain} />
+      <ChatContainer />
     </ThemeProvider>
   );
 }

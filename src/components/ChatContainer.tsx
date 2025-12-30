@@ -9,9 +9,9 @@ import * as ScrollArea from '@radix-ui/react-scroll-area';
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 
-export function ChatContainer({ domain }: { domain: string }) {
+export function ChatContainer() {
   const theme = useTheme();
-  const { messages, sendMessage, isLoading } = useChat(domain);
+  const { messages, sendMessage, isLoading } = useChat();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive

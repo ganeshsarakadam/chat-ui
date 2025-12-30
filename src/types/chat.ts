@@ -9,6 +9,6 @@ export interface ChatResponse {
   answer: string;
   sources?: Array<{
     content: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }>;
 }
