@@ -2,9 +2,9 @@
 
 import { useTheme } from './ThemeProvider';
 import { MessageBubble } from './MessageBubble';
-import { InputArea } from './InputArea';
+// InputArea is defined inline as ChatInput
 import { useChat } from '@/hooks/useChat';
-import { Theme } from '@/themes/types';
+// Theme type not currently needed here
 import * as ScrollArea from '@radix-ui/react-scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef } from 'react';
@@ -144,7 +144,7 @@ export function ChatContainer() {
               exit={{ opacity: 0 }}
               className="flex-1 flex flex-col items-center justify-center px-4"
             >
-              <WelcomeMessage theme={theme} onSend={sendMessage} disabled={isLoading} />
+              <WelcomeMessage onSend={sendMessage} disabled={isLoading} />
             </motion.div>
           ) : (
             /* Chat view - Messages */
@@ -202,11 +202,10 @@ export function ChatContainer() {
 
 /* Welcome message component - ChatGPT style */
 function WelcomeMessage({
-  theme,
   onSend,
   disabled
 }: {
-  theme: Theme;
+  // theme: Theme; - not currently used
   onSend: (msg: string, mode: 'quick' | 'detailed') => void;
   disabled: boolean;
 }) {

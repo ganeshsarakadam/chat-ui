@@ -16,6 +16,7 @@ interface MessageBubbleProps {
   animationStyle: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function MessageBubble({ message, avatar, animationStyle }: MessageBubbleProps) {
   const isUser = message.role === 'user';
 
