@@ -17,6 +17,7 @@ export function InputArea({ onSend, disabled, placeholder = 'Type your message..
   const [isFocused, setIsFocused] = useState(false);
   const [showModeDropdown, setShowModeDropdown] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -25,6 +26,17 @@ export function InputArea({ onSend, disabled, placeholder = 'Type your message..
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [input]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowModeDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -46,104 +58,101 @@ export function InputArea({ onSend, disabled, placeholder = 'Type your message..
 
   return (
     <motion.div
-      initial={{ y: 100, opacity: 0 }}
+      initial={{ y: 30, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="relative backdrop-blur-xl border-t z-20"
+      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+      className="relative z-20 glass-strong"
       style={{
-        backgroundColor: `${getComputedStyle(document.documentElement).getPropertyValue('--color-background')}f0`,
-        borderColor: `${getComputedStyle(document.documentElement).getPropertyValue('--color-border')}40`,
+        borderTop: '1px solid var(--color-border)',
       }}
     >
-      {/* Gradient glow on focus */}
-      <AnimatePresence>
-        {isFocused && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 -top-20 pointer-events-none"
-            style={{
-              background: `linear-gradient(to top, ${getComputedStyle(document.documentElement).getPropertyValue('--color-primary')}10, transparent)`,
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      <div className="max-w-5xl mx-auto px-6 py-6">
+      <div className="max-w-4xl mx-auto px-6 py-4">
         <form onSubmit={handleSubmit}>
           <div className="relative">
-            {/* Input container with glassmorphism */}
+            {/* Input container - Sleek Modern Design */}
             <motion.div
-              animate={{
-                boxShadow: isFocused
-                  ? `0 0 0 3px ${getComputedStyle(document.documentElement).getPropertyValue('--color-primary')}40`
-                  : '0 4px 20px rgba(0, 0, 0, 0.05)',
-              }}
-              className="flex gap-3 p-3 rounded-3xl backdrop-blur-lg border transition-all duration-300"
+              className="flex items-end gap-2 p-2 rounded-2xl transition-all duration-200"
               style={{
-                backgroundColor: `${getComputedStyle(document.documentElement).getPropertyValue('--color-input-bg')}f0`,
-                borderColor: isFocused
-                  ? `${getComputedStyle(document.documentElement).getPropertyValue('--color-primary')}60`
-                  : `${getComputedStyle(document.documentElement).getPropertyValue('--color-border')}40`,
+                backgroundColor: 'var(--color-surface)',
+                border: `1px solid ${isFocused ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                boxShadow: isFocused
+                  ? '0 0 0 3px rgba(99, 102, 241, 0.1), var(--shadow-md)'
+                  : 'var(--shadow-sm)',
               }}
             >
-              {/* Mode Selector */}
-              <div className="relative flex items-center">
-                <button
+              {/* Mode Selector - Pill style */}
+              <div className="relative flex-shrink-0" ref={dropdownRef}>
+                <motion.button
                   type="button"
                   onClick={() => setShowModeDropdown(!showModeDropdown)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm transition-all hover:opacity-80 border"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-medium text-xs transition-all cursor-pointer"
                   style={{
-                    backgroundColor: `${getComputedStyle(document.documentElement).getPropertyValue('--color-primary')}20`,
-                    borderColor: `${getComputedStyle(document.documentElement).getPropertyValue('--color-primary')}40`,
+                    backgroundColor: 'var(--color-border-subtle)',
                     color: 'var(--color-text)',
                   }}
                 >
                   <span className="capitalize">{mode}</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <motion.svg
+                    animate={{ rotate: showModeDropdown ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-3 h-3 opacity-50"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                  </motion.svg>
+                </motion.button>
 
-                {/* Dropdown */}
+                {/* Dropdown - Sleek floating panel */}
                 <AnimatePresence>
                   {showModeDropdown && (
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute bottom-full mb-2 left-0 rounded-xl border shadow-lg overflow-hidden z-50"
+                      initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute bottom-full mb-2 left-0 rounded-xl overflow-hidden z-50 glass-strong shadow-sleek-lg"
                       style={{
-                        backgroundColor: `${getComputedStyle(document.documentElement).getPropertyValue('--color-input-bg')}f0`,
-                        borderColor: `${getComputedStyle(document.documentElement).getPropertyValue('--color-border')}40`,
+                        minWidth: '120px',
                       }}
                     >
                       {(['quick', 'detailed'] as const).map((modeOption) => (
-                        <button
+                        <motion.button
                           key={modeOption}
                           type="button"
                           onClick={() => {
                             setMode(modeOption);
                             setShowModeDropdown(false);
                           }}
-                          className="w-full px-4 py-2 text-left text-sm hover:opacity-80 transition-all capitalize"
+                          whileHover={{ backgroundColor: 'var(--color-border-subtle)' }}
+                          className={`w-full px-4 py-2.5 text-left text-xs font-medium transition-all capitalize cursor-pointer flex items-center gap-2`}
                           style={{
-                            backgroundColor: mode === modeOption
-                              ? `${getComputedStyle(document.documentElement).getPropertyValue('--color-primary')}20`
-                              : 'transparent',
                             color: 'var(--color-text)',
+                            backgroundColor: mode === modeOption ? 'var(--color-border-subtle)' : 'transparent',
                           }}
                         >
-                          {modeOption}
-                        </button>
+                          {mode === modeOption && (
+                            <motion.div
+                              layoutId="activeMode"
+                              className="w-1 h-1 rounded-full"
+                              style={{ backgroundColor: 'var(--color-primary)' }}
+                            />
+                          )}
+                          <span>{modeOption}</span>
+                          <span className="ml-auto text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
+                            {modeOption === 'quick' ? '⚡' : '📝'}
+                          </span>
+                        </motion.button>
                       ))}
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
-              {/* Textarea */}
+              {/* Textarea - Clean and minimal */}
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -154,74 +163,70 @@ export function InputArea({ onSend, disabled, placeholder = 'Type your message..
                 placeholder={placeholder}
                 disabled={disabled}
                 rows={1}
-                className="flex-1 px-4 py-3 bg-transparent resize-none outline-none placeholder-opacity-50 transition-all"
+                className="flex-1 px-3 py-2.5 bg-transparent resize-none outline-none text-sm leading-relaxed"
                 style={{
                   color: 'var(--color-text)',
-                  minHeight: '48px',
+                  minHeight: '44px',
                   maxHeight: '120px',
                 }}
               />
 
-              {/* Send button with animations */}
+              {/* Send button - Gradient pill */}
               <motion.button
                 type="submit"
                 disabled={disabled || !input.trim()}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative px-6 py-3 rounded-2xl font-medium text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer overflow-hidden"
+                whileHover={{ scale: disabled || !input.trim() ? 1 : 1.02 }}
+                whileTap={{ scale: disabled || !input.trim() ? 1 : 0.98 }}
+                className="relative flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-medium text-white text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex-shrink-0"
                 style={{
                   background: disabled || !input.trim()
-                    ? `${getComputedStyle(document.documentElement).getPropertyValue('--color-border')}`
-                    : `linear-gradient(135deg, ${getComputedStyle(document.documentElement).getPropertyValue('--color-primary')}, ${getComputedStyle(document.documentElement).getPropertyValue('--color-secondary')})`,
+                    ? 'var(--color-border)'
+                    : 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
+                  boxShadow: disabled || !input.trim()
+                    ? 'none'
+                    : '0 2px 8px rgba(99, 102, 241, 0.25)',
                 }}
               >
-                {/* Shimmer effect on hover */}
-                {!disabled && input.trim() && (
-                  <motion.div
-                    animate={{
-                      x: ['-100%', '200%'],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'linear',
-                    }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                  />
+                {disabled ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                      className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <span>Send</span>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </>
                 )}
-
-                <span className="relative flex items-center gap-2">
-                  {disabled ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                      />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      Send
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                      </svg>
-                    </>
-                  )}
-                </span>
               </motion.button>
             </motion.div>
           </div>
 
-          {/* Helper text */}
+          {/* Helper text - Subtle and minimal */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: isFocused ? 1 : 0.5 }}
-            className="flex items-center justify-between mt-3 px-4 text-xs transition-opacity"
-            style={{ color: 'var(--color-text)' }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center justify-between mt-2 px-1"
           >
-            <span>Press Enter to send, Shift+Enter for new line</span>
-            <span className="opacity-60">{input.length} characters</span>
+            <span className="text-[11px]" style={{ color: 'var(--color-text-muted)', opacity: 0.6 }}>
+              Press <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ backgroundColor: 'var(--color-border-subtle)' }}>Enter</kbd> to send · <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ backgroundColor: 'var(--color-border-subtle)' }}>Shift+Enter</kbd> for new line
+            </span>
+            {input.length > 0 && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 0.5, scale: 1 }}
+                className="text-[10px] tabular-nums"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                {input.length}
+              </motion.span>
+            )}
           </motion.div>
         </form>
       </div>

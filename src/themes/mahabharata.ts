@@ -5,23 +5,37 @@ export const mahabharataTheme: Theme = {
   name: 'Mahabharata',
   description: 'Ancient Indian epic of dharma and cosmic battles',
   colors: {
-    primary: '#FF6B35',      // Saffron
-    secondary: '#F7931E',    // Deep orange
-    accent: '#D4AF37',       // Gold
-    background: '#FFF8E7',   // Warm cream
-    text: '#2C1810',         // Dark brown
-    border: '#E8C4A0',       // Light terracotta
+    primary: '#FF6B35',      // Vibrant saffron (kept for cultural significance)
+    secondary: '#F97316',    // Modern orange
+    accent: '#FBBF24',       // Bright gold
+    background: '#F5F5F5',   // Light gray background for contrast
+    text: '#0F172A',         // Slate 900 (high contrast)
+    border: '#E2E8F0',       // Slate 200 (subtle)
     messageBg: {
-      user: '#FFE4CC',
-      assistant: '#FFFFFF',
+      user: '#FFFFFF',       // Pure white
+      assistant: '#FFFFFF',  // Pure white
     },
-    inputBg: '#FFFFFF',
-    headerBg: '#FF6B35',
+    inputBg: '#FFFFFF',      // Pure white
+    headerBg: '#FFFFFF',     // Clean white for light mode
+  },
+  darkColors: {
+    primary: '#FF6B35',      // Keep vibrant saffron
+    secondary: '#F97316',    // Modern orange
+    accent: '#FBBF24',       // Bright gold
+    background: '#0F172A',   // Dark slate
+    text: '#F8FAFC',         // Light slate
+    border: '#1E293B',       // Slate 800
+    messageBg: {
+      user: '#1E293B',       // Slate 800
+      assistant: '#0F172A',  // Darker slate
+    },
+    inputBg: '#1E293B',      // Slate 800
+    headerBg: '#020617',     // Almost black
   },
   fonts: {
-    heading: '"Cinzel", serif',
-    body: '"Lora", serif',
-    code: '"Fira Code", monospace',
+    heading: '"Inter", system-ui, sans-serif',
+    body: '"Inter", system-ui, sans-serif',
+    code: '"JetBrains Mono", "Fira Code", monospace',
   },
   avatars: {
     assistant: '/avatars/mahabharata/krishna.png',
@@ -30,7 +44,7 @@ export const mahabharataTheme: Theme = {
   patterns: {
     background: '/patterns/mahabharata/lotus-mandala.svg',
     decoration: '/patterns/mahabharata/om-border.svg',
-    opacity: 0.05,
+    opacity: 0.03,           // More subtle pattern
   },
   animations: {
     messageEntry: 'fadeSlideUp',

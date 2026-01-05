@@ -1,21 +1,24 @@
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  text: string;
+  border: string;
+  messageBg: {
+    user: string;
+    assistant: string;
+  };
+  inputBg: string;
+  headerBg: string;
+}
+
 export interface Theme {
   id: string;
   name: string;
   description: string;
-  colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    background: string;
-    text: string;
-    border: string;
-    messageBg: {
-      user: string;
-      assistant: string;
-    };
-    inputBg: string;
-    headerBg: string;
-  };
+  colors: ThemeColors;
+  darkColors?: ThemeColors;
   fonts: {
     heading: string;
     body: string;

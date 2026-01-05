@@ -6,11 +6,11 @@ import { InputArea } from './InputArea';
 import { useChat } from '@/hooks/useChat';
 import { Theme } from '@/themes/types';
 import * as ScrollArea from '@radix-ui/react-scroll-area';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 
 export function ChatContainer() {
-  const theme = useTheme();
+  const { theme, isDarkMode, toggleDarkMode } = useTheme();
   const { messages, sendMessage, isLoading } = useChat();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -21,298 +21,432 @@ export function ChatContainer() {
     }
   }, [messages]);
 
+  const hasMessages = messages.length > 0;
+
   return (
-    <div className="flex flex-col h-screen relative">
-      {/* Animated background gradient */}
-      <div
-        className="absolute inset-0 opacity-30 pointer-events-none"
-        style={{
-          background: `linear-gradient(135deg, ${theme.colors.primary}10 0%, ${theme.colors.secondary}10 100%)`,
-        }}
-      />
-
-      {/* Modern Header with glassmorphism */}
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative backdrop-blur-xl border-b shadow-lg z-10"
-        style={{
-          backgroundColor: `${theme.colors.primary}f0`,
-          borderColor: `${theme.colors.primary}40`,
-          boxShadow: `0 4px 24px ${theme.colors.primary}20`,
-        }}
+    <div
+      className="flex flex-col h-screen"
+      style={{ backgroundColor: 'var(--color-background)' }}
+    >
+      {/* Header - Always visible */}
+      <header
+        className="flex items-center justify-between px-4 py-3 z-10"
+        style={{ borderBottom: hasMessages ? '1px solid var(--color-border)' : 'none' }}
       >
-        <div className="max-w-5xl mx-auto px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {/* Animated icon */}
-              <motion.div
-                animate={{
-                  rotate: [0, 360],
-                  scale: [1, 1.1, 1],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${theme.colors.secondary}, ${theme.colors.accent})`,
-                }}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-              </motion.div>
+        {/* Left side - Title with icon space */}
+        <div className="flex items-center gap-2">
+          {/* Icon placeholder */}
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
+            }}
+          >
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          <h1
+            className="text-sm font-medium"
+            style={{ color: 'var(--color-text)' }}
+          >
+            Mahabharatam
+          </h1>
 
-              <div>
-                <motion.h1
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  {theme.name}
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-white/90 text-sm mt-1"
-                >
-                  {theme.description}
-                </motion.p>
-              </div>
-            </div>
-
-            {/* Status indicator */}
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.4, type: 'spring' }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm"
+          {/* Info icon with tooltip */}
+          <div className="relative group">
+            <button
+              className="w-5 h-5 rounded-full flex items-center justify-center cursor-help transition-opacity hover:opacity-80"
+              style={{
+                backgroundColor: 'var(--color-border)',
+                color: 'var(--color-text-muted)',
+              }}
+              aria-label="About this application"
             >
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-2 h-2 rounded-full bg-green-400"
-              />
-              <span className="text-white text-xs font-medium">Online</span>
-            </motion.div>
+              <span className="text-xs font-medium">i</span>
+            </button>
+
+            {/* Tooltip */}
+            <div
+              className="absolute left-0 top-full mt-2 w-72 p-3 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              }}
+            >
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+                Powered by the knowledge from <strong style={{ color: 'var(--color-text)' }}>The Mahabharata</strong> — Translated into English Prose from the Original Sanskrit Text by <strong style={{ color: 'var(--color-primary)' }}>Kisari Mohan Ganguli</strong>
+              </p>
+            </div>
           </div>
         </div>
-      </motion.header>
 
-      {/* Messages area with Radix ScrollArea */}
-      <ScrollArea.Root className="flex-1 overflow-hidden relative z-0">
-        <ScrollArea.Viewport className="w-full h-full" ref={scrollRef}>
-          <div className="max-w-5xl mx-auto px-6 py-8">
-            {messages.length === 0 && <WelcomeMessage theme={theme} />}
+        {/* Right side - Theme toggle & User */}
+        <div className="flex items-center gap-1">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+            style={{ color: 'var(--color-text)' }}
+            aria-label="Toggle theme"
+          >
+            {isDarkMode ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
 
-            <div className="space-y-6">
-              {messages.map((msg, idx) => (
-                <MessageBubble
-                  key={msg.id || idx}
-                  message={msg}
-                  avatar={msg.role === 'assistant'
-                    ? theme.avatars.assistant
-                    : theme.avatars.user
-                  }
-                  animationStyle={theme.animations.messageEntry}
-                />
-              ))}
+          {/* User icon - Disabled with tooltip */}
+          <div className="relative group">
+            <button
+              disabled
+              className="p-2 rounded-lg transition-colors cursor-not-allowed opacity-50"
+              style={{ color: 'var(--color-text)' }}
+              aria-label="User menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </button>
 
-              {isLoading && <ThinkingIndicator theme={theme} />}
+            {/* Tooltip */}
+            <div
+              className="absolute right-0 top-full mt-2 px-3 py-2 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              }}
+            >
+              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                Login feature coming soon
+              </p>
             </div>
           </div>
-        </ScrollArea.Viewport>
+        </div>
+      </header>
 
-        <ScrollArea.Scrollbar
-          className="flex select-none touch-none p-0.5 transition-colors duration-300 ease-out hover:bg-gray-100/20 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
-          orientation="vertical"
-        >
-          <ScrollArea.Thumb
-            className="flex-1 rounded-full relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]"
-            style={{ backgroundColor: theme.colors.primary }}
-          />
-        </ScrollArea.Scrollbar>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <AnimatePresence mode="wait">
+          {!hasMessages ? (
+            /* Welcome view - Centered */
+            <motion.div
+              key="welcome"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 flex flex-col items-center justify-center px-4"
+            >
+              <WelcomeMessage theme={theme} onSend={sendMessage} disabled={isLoading} />
+            </motion.div>
+          ) : (
+            /* Chat view - Messages */
+            <motion.div
+              key="chat"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex-1 flex flex-col overflow-hidden"
+            >
+              <ScrollArea.Root className="flex-1 overflow-hidden">
+                <ScrollArea.Viewport className="w-full h-full" ref={scrollRef}>
+                  <div className="max-w-3xl mx-auto px-4 py-6">
+                    <div className="space-y-6">
+                      {messages.map((msg, idx) => (
+                        <MessageBubble
+                          key={msg.id || idx}
+                          message={msg}
+                          avatar={msg.role === 'assistant'
+                            ? theme.avatars.assistant
+                            : theme.avatars.user
+                          }
+                          animationStyle={theme.animations.messageEntry}
+                        />
+                      ))}
 
-        <ScrollArea.Corner />
-      </ScrollArea.Root>
+                      {isLoading && <ThinkingIndicator />}
+                    </div>
+                  </div>
+                </ScrollArea.Viewport>
 
-      {/* Input area */}
-      <InputArea
-        onSend={sendMessage}
-        disabled={isLoading}
-        placeholder={`Ask about ${theme.name}...`}
-      />
+                <ScrollArea.Scrollbar
+                  className="flex select-none touch-none p-0.5 transition-opacity hover:opacity-100 opacity-50 data-[orientation=vertical]:w-2"
+                  orientation="vertical"
+                >
+                  <ScrollArea.Thumb
+                    className="flex-1 rounded-full"
+                    style={{ background: 'var(--color-text-muted)' }}
+                  />
+                </ScrollArea.Scrollbar>
+              </ScrollArea.Root>
+
+              {/* Input area - Fixed at bottom when chatting */}
+              <div className="border-t" style={{ borderColor: 'var(--color-border)' }}>
+                <div className="max-w-3xl mx-auto px-4 py-4">
+                  <ChatInput onSend={sendMessage} disabled={isLoading} />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
 
-function WelcomeMessage({ theme }: { theme: Theme }) {
+/* Welcome message component - ChatGPT style */
+function WelcomeMessage({
+  theme,
+  onSend,
+  disabled
+}: {
+  theme: Theme;
+  onSend: (msg: string, mode: 'quick' | 'detailed') => void;
+  disabled: boolean;
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
-      className="text-center py-20 px-4"
-    >
-      {/* Animated icon with pulse effect */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-        className="relative w-24 h-24 mx-auto mb-8"
-      >
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.5, 0.8, 0.5],
-          }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className="absolute inset-0 rounded-full blur-xl"
-          style={{ backgroundColor: theme.colors.primary }}
-        />
-        <div
-          className="relative w-full h-full rounded-3xl flex items-center justify-center shadow-2xl"
-          style={{
-            background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
-          }}
-        >
-          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-          </svg>
-        </div>
-      </motion.div>
-
-      <motion.h2
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent"
+    <div className="w-full max-w-2xl mx-auto text-center">
+      {/* Main heading */}
+      <motion.h1
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="text-3xl md:text-4xl font-medium mb-8"
         style={{
+          color: 'var(--color-text)',
           fontFamily: 'var(--font-heading)',
-          backgroundImage: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
         }}
       >
-        Welcome to {theme.name}
-      </motion.h2>
+        Learn <span style={{ color: 'var(--color-primary)' }}>Mahabharatam</span>
+        <br />
+        <span className="text-2xl md:text-3xl opacity-60">What questions do you have?</span>
+      </motion.h1>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="text-lg md:text-xl mb-10 opacity-80 max-w-2xl mx-auto"
-      >
-        {theme.description}
-      </motion.p>
-
+      {/* Centered input */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="max-w-md mx-auto grid grid-cols-3 gap-4 mb-10"
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="w-full"
       >
-        {[
-          { label: 'Culture', value: theme.metadata.culture },
-          { label: 'Language', value: theme.metadata.primaryLanguage },
-          { label: 'Region', value: theme.metadata.region },
-        ].map((item, idx) => (
-          <motion.div
-            key={item.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 + idx * 0.1 }}
-            className="p-4 rounded-2xl backdrop-blur-sm border"
-            style={{
-              backgroundColor: `${theme.colors.primary}10`,
-              borderColor: `${theme.colors.primary}30`,
-            }}
-          >
-            <p className="text-xs opacity-60 mb-1">{item.label}</p>
-            <p className="font-semibold text-sm">{item.value}</p>
-          </motion.div>
-        ))}
+        <ChatInput onSend={onSend} disabled={disabled} />
       </motion.div>
 
-      <motion.p
+      {/* Quick suggestions */}
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.9 }}
-        className="text-sm opacity-60 flex items-center justify-center gap-2"
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="mt-6 flex flex-wrap justify-center gap-2"
       >
-        <motion.span
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          ✨
-        </motion.span>
-        Ask me anything about {theme.name}
-        <motion.span
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-        >
-          ✨
-        </motion.span>
-      </motion.p>
-    </motion.div>
+        {[
+          "Who is Arjuna?",
+          "Explain the Bhagavad Gita",
+          "What is Dharma?",
+          "Tell me about Krishna",
+        ].map((suggestion) => (
+          <button
+            key={suggestion}
+            onClick={() => onSend(suggestion, 'quick')}
+            disabled={disabled}
+            className="px-4 py-2 text-sm transition-all hover:scale-105 cursor-pointer disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              color: 'var(--color-text-muted)',
+              borderRadius: '20px',
+            }}
+          >
+            {suggestion}
+          </button>
+        ))}
+      </motion.div>
+    </div>
   );
 }
 
-function ThinkingIndicator({ theme }: { theme: Theme }) {
+/* ChatGPT-style input component */
+function ChatInput({
+  onSend,
+  disabled
+}: {
+  onSend: (msg: string, mode: 'quick' | 'detailed') => void;
+  disabled: boolean;
+}) {
+  const [input, setInput] = React.useState('');
+  const [mode, setMode] = React.useState<'quick' | 'detailed'>('quick');
+  const [isFocused, setIsFocused] = React.useState(false);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea
+  React.useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  }, [input]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim() && !disabled) {
+      onSend(input.trim(), mode);
+      setInput('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="relative">
+      <div
+        className="flex items-center gap-3 px-4 py-3 transition-all"
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          border: isFocused ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+          borderRadius: '28px',
+          boxShadow: isFocused ? '0 0 0 3px rgba(255, 107, 53, 0.15)' : 'none',
+        }}
+      >
+        {/* Mode badges */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setMode('quick')}
+            className="px-2.5 py-1 text-xs font-medium transition-all cursor-pointer"
+            style={{
+              borderRadius: '12px',
+              backgroundColor: mode === 'quick' ? 'var(--color-primary)' : 'transparent',
+              color: mode === 'quick' ? 'white' : 'var(--color-text-muted)',
+              border: mode === 'quick' ? 'none' : '1px solid var(--color-border)',
+            }}
+          >
+            Quick
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('detailed')}
+            className="px-2.5 py-1 text-xs font-medium transition-all cursor-pointer"
+            style={{
+              borderRadius: '12px',
+              backgroundColor: mode === 'detailed' ? 'var(--color-primary)' : 'transparent',
+              color: mode === 'detailed' ? 'white' : 'var(--color-text-muted)',
+              border: mode === 'detailed' ? 'none' : '1px solid var(--color-border)',
+            }}
+          >
+            Pro
+          </button>
+        </div>
+
+        {/* Input */}
+        <textarea
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder="Ask anything related to Mahabharatam"
+          disabled={disabled}
+          rows={1}
+          className="flex-1 bg-transparent resize-none text-sm py-1"
+          style={{
+            color: 'var(--color-text)',
+            minHeight: '24px',
+            maxHeight: '200px',
+            outline: 'none',
+            border: 'none',
+          }}
+        />
+
+        {/* Send button - only show when there's input */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {input.trim() && (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              type="submit"
+              disabled={disabled}
+              className="p-2 rounded-full transition-colors cursor-pointer disabled:opacity-50"
+              style={{
+                backgroundColor: 'var(--color-text)',
+                color: 'var(--color-background)',
+              }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </motion.button>
+          )}
+        </div>
+      </div>
+    </form>
+  );
+}
+
+/* Thinking indicator */
+function ThinkingIndicator() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="flex items-start gap-3"
     >
-      {/* Avatar placeholder */}
       <div
-        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-        style={{ backgroundColor: `${theme.colors.primary}20` }}
+        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+        style={{ backgroundColor: 'var(--color-surface)' }}
       >
-        <svg className="w-5 h-5" style={{ color: theme.colors.primary }} fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-        </svg>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="w-4 h-4 border-2 rounded-full"
+          style={{
+            borderColor: 'var(--color-border)',
+            borderTopColor: 'var(--color-primary)',
+          }}
+        />
       </div>
-
-      {/* Thinking animation */}
       <div
-        className="px-6 py-4 rounded-3xl rounded-tl-sm backdrop-blur-sm border shadow-lg"
+        className="px-4 py-3 rounded-2xl rounded-tl-sm"
         style={{
-          backgroundColor: `${theme.colors.messageBg.assistant}f0`,
-          borderColor: `${theme.colors.primary}20`,
+          backgroundColor: 'var(--color-surface)',
         }}
       >
-        <div className="flex items-center gap-2">
-          <motion.div className="flex gap-1">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                animate={{
-                  y: [0, -8, 0],
-                  opacity: [0.5, 1, 0.5],
-                }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  delay: i * 0.15,
-                  ease: 'easeInOut',
-                }}
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: theme.colors.primary }}
-              />
-            ))}
-          </motion.div>
-          <span className="text-sm ml-2" style={{ color: theme.colors.text }}>
-            Thinking...
-          </span>
+        <div className="flex items-center gap-1">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              animate={{
+                y: [0, -4, 0],
+                opacity: [0.3, 1, 0.3],
+              }}
+              transition={{
+                duration: 0.6,
+                repeat: Infinity,
+                delay: i * 0.1,
+              }}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: 'var(--color-text-muted)' }}
+            />
+          ))}
         </div>
       </div>
     </motion.div>
   );
 }
+
+// Need to import React for the component-level state
+import React from 'react';

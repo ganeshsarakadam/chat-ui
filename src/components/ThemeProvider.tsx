@@ -7,6 +7,8 @@ import { ThemeLoader } from '@/themes/loader';
 interface ThemeContextValue {
   theme: Theme;
   isLoading: boolean;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -20,6 +22,15 @@ export function ThemeProvider({
 }) {
   const [theme, setTheme] = useState<Theme | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Load theme preference from localStorage
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode !== null) {
+      setIsDarkMode(savedMode === 'true');
+    }
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -47,33 +58,44 @@ export function ThemeProvider({
     };
   }, [domainId]);
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => {
+      const newMode = !prev;
+      localStorage.setItem('darkMode', String(newMode));
+      return newMode;
+    });
+  };
+
   if (isLoading || !theme) {
     return <ThemeLoadingSkeleton />;
   }
 
+  // Use dark colors if dark mode is enabled and available
+  const activeColors = (isDarkMode && theme.darkColors) ? theme.darkColors : theme.colors;
+
   return (
-    <ThemeContext.Provider value={{ theme, isLoading }}>
+    <ThemeContext.Provider value={{ theme, isLoading, isDarkMode, toggleDarkMode }}>
       <div
-        className="min-h-screen transition-all duration-500 ease-in-out"
+        className={`min-h-screen transition-all duration-500 ease-in-out ${isDarkMode ? 'dark' : 'light'}`}
         style={{
           // CSS custom properties
-          '--color-primary': theme.colors.primary,
-          '--color-secondary': theme.colors.secondary,
-          '--color-accent': theme.colors.accent,
-          '--color-background': theme.colors.background,
-          '--color-text': theme.colors.text,
-          '--color-border': theme.colors.border,
-          '--color-message-user': theme.colors.messageBg.user,
-          '--color-message-assistant': theme.colors.messageBg.assistant,
-          '--color-input-bg': theme.colors.inputBg,
-          '--color-header-bg': theme.colors.headerBg,
+          '--color-primary': activeColors.primary,
+          '--color-secondary': activeColors.secondary,
+          '--color-accent': activeColors.accent,
+          '--color-background': activeColors.background,
+          '--color-text': activeColors.text,
+          '--color-border': activeColors.border,
+          '--color-message-user': activeColors.messageBg.user,
+          '--color-message-assistant': activeColors.messageBg.assistant,
+          '--color-input-bg': activeColors.inputBg,
+          '--color-header-bg': activeColors.headerBg,
           '--font-heading': theme.fonts.heading,
           '--font-body': theme.fonts.body,
 
           // Apply base styles
           fontFamily: theme.fonts.body,
-          backgroundColor: theme.colors.background,
-          color: theme.colors.text,
+          backgroundColor: activeColors.background,
+          color: activeColors.text,
         } as React.CSSProperties}
       >
         {/* Background pattern */}
@@ -99,12 +121,12 @@ export function ThemeProvider({
   );
 }
 
-export function useTheme(): Theme {
+export function useTheme() {
   const context = useContext(ThemeContext);
   if (!context) {
     throw new Error('useTheme must be used within ThemeProvider');
   }
-  return context.theme;
+  return context;
 }
 
 function ThemeLoadingSkeleton() {
